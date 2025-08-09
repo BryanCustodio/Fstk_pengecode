@@ -92,10 +92,16 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'teamleader') {
     </table>
 </main>
 
+<!-- Notification sound -->
+<audio id="notifSound" src="sound.mp3" preload="auto"></audio>
+
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
 <script>
 $(document).ready(function() {
+    var lastUnreadTotal = 0;
+    var notifSound = document.getElementById("notifSound");
+
     var table = $('#userTable').DataTable({
         ajax: {
             url: 'fetch_users.php?role=teamleader',
@@ -104,6 +110,18 @@ $(document).ready(function() {
                 json.data.sort(function(a, b) {
                     return b.unread_count - a.unread_count;
                 });
+
+                // Calculate total unread messages
+                var totalUnread = json.data.reduce(function(sum, user) {
+                    return sum + (parseInt(user.unread_count) || 0);
+                }, 0);
+
+                // Play sound only if unread increased
+                if (totalUnread > lastUnreadTotal) {
+                    notifSound.play();
+                }
+
+                lastUnreadTotal = totalUnread;
                 return json.data;
             }
         },

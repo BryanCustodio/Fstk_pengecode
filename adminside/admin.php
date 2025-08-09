@@ -1,7 +1,7 @@
 <?php
 // register.php
 session_start();
-require "db.php";
+require "../db.php";
 
 $err = "";
 $ok = "";
@@ -118,11 +118,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input name="username" placeholder="Username" required>
         <input name="password" type="password" placeholder="Password" required>
         <select name="role">
-            <option value="staff">Staff</option>
+            <option value="teamleader">Team Leader</option>
+            <option value="it">IT</option>
         </select>
         <button type="submit">Register</button>
     </form>
-    <p class="message">Already have an account? <a href="index.php">Login here</a></p>
+    <p class="message">Already have an account? <a href="../index.php">Login here</a></p>
     <?php if ($err) echo "<p class='message error'>$err</p>"; ?>
     <?php if ($ok) echo "<p class='message success'>$ok</p>"; ?>
 </div>
