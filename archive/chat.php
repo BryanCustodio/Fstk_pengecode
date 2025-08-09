@@ -16,11 +16,7 @@ $res = $stmt->get_result();
 if ($res->num_rows !== 1) { echo "User not found."; exit(); }
 $otherUser = $res->fetch_assoc();
 
-// ✅ AUTO-MARK as READ pag open pa lang ng chat
-$update = $conn->prepare("UPDATE messages SET status = 'read', is_read = 1 
-                          WHERE sender_id = ? AND receiver_id = ? AND status = 'unread'");
-$update->bind_param("ii", $other, $me);
-$update->execute();
+// optional: you may add access rules here (e.g., staff cannot chat staff) - already enforced via dashboards
 ?>
 <!DOCTYPE html>
 <html>
