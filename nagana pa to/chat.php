@@ -7,7 +7,6 @@ $me = (int)$_SESSION['user_id'];
 $other = isset($_GET['user_id']) ? (int)$_GET['user_id'] : 0;
 if ($other <= 0) { echo "No user selected."; exit(); }
 
-// Kunin yung user info ng ka-chat
 $stmt = $conn->prepare("SELECT id, fullname, username, role, employee_number FROM users WHERE id = ?");
 $stmt->bind_param("i",$other);
 $stmt->execute();
@@ -15,14 +14,6 @@ $res = $stmt->get_result();
 if ($res->num_rows !== 1) { echo "User not found."; exit(); }
 $otherUser = $res->fetch_assoc();
 
-// Kunin last known IP ng user na ka-chat
-$ip_stmt = $conn->prepare("SELECT ip_address FROM messages WHERE sender_id = ? ORDER BY id DESC LIMIT 1");
-$ip_stmt->bind_param("i", $other);
-$ip_stmt->execute();
-$ip_res = $ip_stmt->get_result();
-$lastIp = ($ip_res->num_rows > 0) ? $ip_res->fetch_assoc()['ip_address'] : 'N/A';
-
-// Mark messages as read
 $update = $conn->prepare("UPDATE messages SET status = 'read', is_read = 1 
                           WHERE sender_id = ? AND receiver_id = ? AND status = 'unread'");
 $update->bind_param("ii", $other, $me);
@@ -56,18 +47,10 @@ $update->execute();
         background: #8e44ad;
         color: white;
         padding: 15px;
-        font-size: 14px;
+        font-size: 16px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        flex-wrap: wrap;
-    }
-    .chat-header div {
-        line-height: 1.4;
-    }
-    .chat-header small {
-        font-size: 12px;
-        color: #f0f0f0;
     }
     .chat-header a {
         color: white;
@@ -129,11 +112,7 @@ $update->execute();
 
 <div class="chat-container">
     <div class="chat-header">
-        <div>
-            <span>💬 <?=htmlspecialchars($otherUser['fullname'])?> (<?=htmlspecialchars($otherUser['role'])?>)</span><br>
-            <small>Employee #: <?=htmlspecialchars($otherUser['employee_number'])?></small><br>
-            <small>Last IP: <?=htmlspecialchars($lastIp)?></small>
-        </div>
+        <span>💬 <?=htmlspecialchars($otherUser['fullname'])?> (<?=htmlspecialchars($otherUser['role'])?>)</span>
         <a href="<?php
             if ($_SESSION['role']=='staff') echo 'staff_dashboard.php';
             elseif ($_SESSION['role']=='teamleader') echo 'teamleader_dashboard.php';
@@ -170,7 +149,7 @@ $("#chat-form").submit(function(e){
     });
 });
 
-setInterval(loadMessages, 1000);
+setInterval(loadMessages, 2000);
 loadMessages();
 </script>
 

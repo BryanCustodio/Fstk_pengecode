@@ -149,7 +149,7 @@ $(document).ready(function() {
     // Auto-refresh every 3 seconds
     setInterval(function() {
         table.ajax.reload(null, false);
-    }, 3000);
+    }, 1000);
 });
 </script>
 

@@ -92,17 +92,37 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'staff') {
     </table>
 </main>
 
+<!-- 🔔 Sound notification -->
+<!-- <audio id="notifSound" src="notif.mp3" preload="auto"></audio> -->
+<audio id="notifSound" src="sound.mp3" preload="auto"></audio>
+
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
 <script>
 $(document).ready(function() {
+    var lastUnread = 0; // track last total unread messages
+
     var table = $('#userTable').DataTable({
         ajax: {
             url: 'fetch_users.php?role=staff',
             dataSrc: function(json) {
+                // sort so unread goes on top
                 json.data.sort(function(a, b) {
                     return b.unread_count - a.unread_count;
                 });
+
+                // compute total unread count
+                let totalUnread = 0;
+                json.data.forEach(function(user) {
+                    totalUnread += parseInt(user.unread_count);
+                });
+
+                // play sound if may bagong chat
+                if (totalUnread > lastUnread) {
+                    document.getElementById("notifSound").play();
+                }
+
+                lastUnread = totalUnread;
                 return json.data;
             }
         },
@@ -127,10 +147,10 @@ $(document).ready(function() {
         order: []
     });
 
-    // Auto-refresh every 3 seconds
+    // auto-refresh every 3 seconds
     setInterval(function() {
         table.ajax.reload(null, false);
-    }, 3000);
+    }, 1000);
 });
 </script>
 
